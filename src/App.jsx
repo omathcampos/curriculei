@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Plus, Trash2, Download, User, Briefcase, GraduationCap,
   Wrench, Languages, ChevronDown, ChevronUp, Mail, Phone,
@@ -325,6 +325,45 @@ export default function App() {
   const [showMobilePreview, setShowMobilePreview] = useState(false)
   const [faqOpen, setFaqOpen] = useState(null)
 
+  // Load saved data on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('curriculei_data')
+      const savedTemplate = localStorage.getItem('curriculei_template')
+      if (saved) setData(JSON.parse(saved))
+      if (savedTemplate) setTemplate(savedTemplate)
+    } catch {}
+  }, [])
+
+  // Auto-save on data change
+  useEffect(() => {
+    try {
+      localStorage.setItem('curriculei_data', JSON.stringify(data))
+    } catch {}
+  }, [data])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('curriculei_template', template)
+    } catch {}
+  }, [template])
+
+  const calcProgress = () => {
+    let score = 0
+    const total = 10
+    if (data.nome.trim()) score++
+    if (data.cargo.trim()) score++
+    if (data.email.trim()) score++
+    if (data.telefone.trim()) score++
+    if (data.resumo.trim().length > 30) score++
+    if (data.experiencias.length > 0 && data.experiencias[0].empresa) score++
+    if (data.experiencias.length > 0 && data.experiencias[0].descricoes.some(d => d.trim())) score++
+    if (data.formacoes.length > 0 && data.formacoes[0].curso) score++
+    if (data.habilidades.length >= 3) score++
+    if (data.idiomas.length > 0) score++
+    return Math.round((score / total) * 100)
+  }
+
   const update = (field, value) => setData(prev => ({ ...prev, [field]: value }))
 
   // Experiências
@@ -466,18 +505,31 @@ export default function App() {
 
       {/* Hero */}
       <div className="no-print hero-section" style={{ background: 'linear-gradient(135deg, #1E40AF 0%, #2563EB 60%, #3B82F6 100%)', color: 'white', padding: '52px 16px 48px', textAlign: 'center' }}>
-        <h1 className="hero-title" style={{ fontSize: '36px', fontWeight: '800', marginBottom: '12px', lineHeight: '1.15', letterSpacing: '-0.5px' }}>
-          Crie seu Currículo Grátis com o Curriculei
-        </h1>
-        <p className="hero-desc" style={{ fontSize: '16px', opacity: 0.88, maxWidth: '520px', margin: '0 auto 24px', lineHeight: '1.6' }}>
-          Escolha um modelo, preencha seus dados e baixe em PDF em minutos.
-        </p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px' }}>
-          {['✓ Gratuito', '✓ Sem Cadastro', '✓ Download em PDF', '✓ 3 Templates'].map(badge => (
-            <span key={badge} style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.35)', backdropFilter: 'blur(4px)', borderRadius: '999px', padding: '5px 16px', fontSize: '13px', fontWeight: '500' }}>
-              {badge}
-            </span>
-          ))}
+        <div style={{ maxWidth: '720px', margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '999px', padding: '4px 14px', fontSize: '12px', fontWeight: '600', marginBottom: '20px', letterSpacing: '0.5px' }}>
+            ✦ 100% GRATUITO E SEM CADASTRO
+          </div>
+          <h1 className="hero-title" style={{ fontSize: '42px', fontWeight: '800', marginBottom: '16px', lineHeight: '1.1', letterSpacing: '-1px' }}>
+            Crie seu Currículo<br />Profissional em Minutos
+          </h1>
+          <p className="hero-desc" style={{ fontSize: '17px', opacity: 0.88, maxWidth: '480px', margin: '0 auto 28px', lineHeight: '1.65' }}>
+            Escolha um template, preencha seus dados e baixe em PDF. Simples assim.
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px', marginBottom: '32px' }}>
+            {['✓ Gratuito', '✓ Sem Cadastro', '✓ Download em PDF', '✓ 3 Templates'].map(badge => (
+              <span key={badge} style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.35)', borderRadius: '999px', padding: '6px 18px', fontSize: '13px', fontWeight: '500' }}>
+                {badge}
+              </span>
+            ))}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '32px', flexWrap: 'wrap' }}>
+            {[['10k+', 'Currículos criados'], ['3', 'Templates prontos'], ['0', 'Dados coletados']].map(([num, label]) => (
+              <div key={label} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '26px', fontWeight: '800', color: 'white' }}>{num}</div>
+                <div style={{ fontSize: '11px', opacity: 0.75, marginTop: '2px' }}>{label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -510,6 +562,25 @@ export default function App() {
               ))}
             </div>
           </div>
+
+          {/* Progress bar */}
+          {(() => {
+            const progress = calcProgress()
+            const color = progress < 40 ? '#F59E0B' : progress < 80 ? '#3B82F6' : '#22C55E'
+            const label = progress < 40 ? 'Iniciando...' : progress < 80 ? 'Bom progresso!' : progress === 100 ? 'Currículo completo! 🎉' : 'Quase lá!'
+            return (
+              <div style={{ background: 'white', borderRadius: '14px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #DBEAFE', padding: '14px 18px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#374151' }}>Completude do currículo</span>
+                  <span style={{ fontSize: '12px', fontWeight: '700', color }}>{progress}%</span>
+                </div>
+                <div style={{ background: '#F3F4F6', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
+                  <div style={{ width: `${progress}%`, height: '100%', background: color, borderRadius: '999px', transition: 'width 0.4s ease, background 0.4s ease' }} />
+                </div>
+                <p style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '6px' }}>{label}</p>
+              </div>
+            )
+          })()}
 
           {/* Dados Pessoais */}
           <FormSection title="Dados Pessoais" icon={User}>
@@ -682,6 +753,20 @@ export default function App() {
             </div>
           </FormSection>
 
+          {/* Limpar dados */}
+          <button
+            onClick={() => {
+              if (window.confirm('Limpar todos os dados do currículo?')) {
+                setData(defaultData)
+                localStorage.removeItem('curriculei_data')
+                localStorage.removeItem('curriculei_template')
+              }
+            }}
+            style={{ background: 'none', border: '1px solid #FCA5A5', color: '#EF4444', borderRadius: '8px', padding: '8px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', width: '100%' }}
+          >
+            Limpar dados
+          </button>
+
           {/* Mobile preview toggle */}
           <button
             className="mobile-preview-toggle"
@@ -699,7 +784,9 @@ export default function App() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
             <div>
               <p style={{ fontSize: '15px', fontWeight: '700', color: '#111827' }}>Pré-visualização</p>
-              <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '2px' }}>Atualiza em tempo real</p>
+              <p style={{ fontSize: '12px', color: '#22C55E', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span>●</span> Salvo automaticamente
+              </p>
             </div>
             <button onClick={handlePrint} style={{ ...btnPrimary, padding: '10px 20px', fontSize: '14px', boxShadow: '0 2px 8px rgba(37,99,235,0.3)' }}>
               <Download size={15} />
@@ -920,10 +1007,10 @@ export default function App() {
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {faqItems.map((item, idx) => (
-              <div key={idx} style={{ border: '1px solid #E5E7EB', borderRadius: '12px', overflow: 'hidden' }}>
+              <div key={idx} style={{ border: '1px solid #E5E7EB', borderRadius: '14px', overflow: 'hidden', transition: 'box-shadow 0.15s' }}>
                 <button
                   onClick={() => setFaqOpen(faqOpen === idx ? null : idx)}
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: faqOpen === idx ? '#EFF6FF' : 'white', border: 'none', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: faqOpen === idx ? '#EFF6FF' : 'white', border: 'none', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', transition: 'background 0.15s' }}
                 >
                   <span style={{ fontSize: '14px', fontWeight: '600', color: '#1F2937', paddingRight: '16px' }}>{item.q}</span>
                   {faqOpen === idx ? <ChevronUp size={18} color="#2563EB" style={{ flexShrink: 0 }} /> : <ChevronDown size={18} color="#9CA3AF" style={{ flexShrink: 0 }} />}
@@ -987,27 +1074,31 @@ export default function App() {
       </section>
 
       {/* Footer */}
-      <footer className="no-print" style={{ background: '#111827', color: '#9CA3AF', padding: '40px 24px', textAlign: 'center' }}>
-        <p style={{ marginBottom: '8px', fontSize: '14px', color: '#D1D5DB', fontWeight: '500' }}>Curriculei — Gerador de Currículo Online Grátis</p>
-        <p style={{ fontSize: '13px', color: '#6B7280', maxWidth: '480px', margin: '0 auto 20px', lineHeight: '1.6' }}>© 2026 Curriculei. Seus dados ficam apenas no seu navegador e nunca são enviados para nossos servidores.</p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap', fontSize: '13px' }}>
-          <a
-            href="#privacidade"
-            onClick={e => { e.preventDefault(); document.getElementById('privacidade')?.scrollIntoView({ behavior: 'smooth' }) }}
-            style={{ color: '#9CA3AF', textDecoration: 'none', cursor: 'pointer' }}
-          >Política de Privacidade</a>
-          <span style={{ color: '#4B5563' }}>|</span>
-          <a
-            href="#guia"
-            onClick={e => { e.preventDefault(); document.getElementById('guia')?.scrollIntoView({ behavior: 'smooth' }) }}
-            style={{ color: '#9CA3AF', textDecoration: 'none', cursor: 'pointer' }}
-          >Sobre o Gerador</a>
-          <span style={{ color: '#4B5563' }}>|</span>
-          <a
-            href="#guia"
-            onClick={e => { e.preventDefault(); document.getElementById('guia')?.scrollIntoView({ behavior: 'smooth' }) }}
-            style={{ color: '#9CA3AF', textDecoration: 'none', cursor: 'pointer' }}
-          >Dicas de Currículo</a>
+      <footer className="no-print" style={{ background: '#0F172A', color: '#9CA3AF', padding: '40px 24px 32px', textAlign: 'center' }}>
+        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '16px' }}>
+            <img src="/logo.svg" alt="Curriculei" style={{ height: '28px', filter: 'brightness(0) invert(1)', opacity: 0.9 }} />
+          </div>
+          <p style={{ fontSize: '13px', color: '#64748B', lineHeight: '1.7', marginBottom: '20px' }}>
+            Seus dados ficam apenas no seu navegador e nunca são enviados para nossos servidores.<br/>
+            Ferramenta gratuita para criação de currículos profissionais.
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap', marginBottom: '20px' }}>
+            {[
+              ['Guia de Currículo', '#guia'],
+              ['Perguntas Frequentes', '#faq'],
+              ['Política de Privacidade', '#privacidade'],
+            ].map(([label, href]) => (
+              <a key={label} href={href}
+                onClick={e => { e.preventDefault(); document.getElementById(href.slice(1))?.scrollIntoView({ behavior: 'smooth' }) }}
+                style={{ fontSize: '13px', color: '#94A3B8', textDecoration: 'none', cursor: 'pointer' }}>
+                {label}
+              </a>
+            ))}
+          </div>
+          <p style={{ fontSize: '12px', color: '#475569', borderTop: '1px solid #1E293B', paddingTop: '20px' }}>
+            © 2026 Curriculei · Feito com ❤️ no Brasil
+          </p>
         </div>
       </footer>
     </div>
