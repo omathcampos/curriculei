@@ -523,7 +523,7 @@ export default function App() {
             ))}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '32px', flexWrap: 'wrap' }}>
-            {[['10k+', 'Currículos criados'], ['3', 'Templates prontos'], ['0', 'Dados coletados']].map(([num, label]) => (
+            {[['100%', 'Gratuito'], ['3', 'Templates prontos'], ['0', 'Dados coletados']].map(([num, label]) => (
               <div key={label} style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '26px', fontWeight: '800', color: 'white' }}>{num}</div>
                 <div style={{ fontSize: '11px', opacity: 0.75, marginTop: '2px' }}>{label}</div>
