@@ -6,44 +6,21 @@ import {
 } from 'lucide-react'
 
 const defaultData = {
-  nome: 'Maria Silva',
-  cargo: 'Desenvolvedora Full Stack',
-  email: 'maria.silva@email.com',
-  telefone: '(11) 99999-9999',
-  cidade: 'São Paulo, SP',
-  linkedin: 'linkedin.com/in/mariasilva',
-  resumo: 'Desenvolvedora apaixonada por tecnologia com 5 anos de experiência em desenvolvimento web. Especialista em React, Node.js e bancos de dados relacionais. Comprometida com a entrega de soluções de alta qualidade.',
+  nome: '',
+  cargo: '',
+  email: '',
+  telefone: '',
+  cidade: '',
+  linkedin: '',
+  resumo: '',
   experiencias: [
-    {
-      id: 1,
-      empresa: 'Tech Corp',
-      cargo: 'Desenvolvedora Full Stack',
-      periodo: 'Jan 2022 – Presente',
-      descricoes: ['Desenvolvimento de aplicações web com React e Node.js', 'Liderança técnica de equipe de 4 desenvolvedores', 'Melhoria de performance resultando em 40% de redução no tempo de carregamento']
-    },
-    {
-      id: 2,
-      empresa: 'Startup XYZ',
-      cargo: 'Desenvolvedora Frontend',
-      periodo: 'Mar 2020 – Dez 2021',
-      descricoes: ['Criação de interfaces responsivas com React e TypeScript', 'Integração de APIs RESTful e GraphQL', 'Implementação de testes automatizados com Jest']
-    }
+    { id: 1, empresa: '', cargo: '', periodo: '', descricoes: [''] }
   ],
   formacoes: [
-    {
-      id: 1,
-      instituicao: 'Universidade de São Paulo',
-      curso: 'Ciência da Computação',
-      periodo: '2016 – 2020',
-      status: 'Concluído'
-    }
+    { id: 1, instituicao: '', curso: '', periodo: '', status: 'Concluído' }
   ],
-  habilidades: ['React', 'Node.js', 'TypeScript', 'Python', 'PostgreSQL', 'Docker', 'Git', 'AWS'],
-  idiomas: [
-    { id: 1, idioma: 'Português', nivel: 'Fluente' },
-    { id: 2, idioma: 'Inglês', nivel: 'Avançado' },
-    { id: 3, idioma: 'Espanhol', nivel: 'Intermediário' }
-  ]
+  habilidades: [],
+  idiomas: []
 }
 
 const templates = {
@@ -928,7 +905,7 @@ export default function App() {
             <h3 style={{ fontSize: '22px', fontWeight: '700', color: '#1E40AF', marginBottom: '20px', borderLeft: '4px solid #2563EB', paddingLeft: '14px' }}>
               Dicas para cada área profissional
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: '16px' }}>
               {[
                 {
                   area: 'Tecnologia e TI',
@@ -1097,7 +1074,7 @@ export default function App() {
             ))}
           </div>
           <p style={{ fontSize: '12px', color: '#475569', borderTop: '1px solid #1E293B', paddingTop: '20px' }}>
-            © 2026 Curriculei · Feito com ❤️ no Brasil
+            © 2026 Curriculei
           </p>
         </div>
       </footer>
